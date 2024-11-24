@@ -38,7 +38,9 @@ class Player extends EngineObject {
     }
 
     update(){
-        this.pos.y = ghostBall.pos.y;
+        if(ghostBall) {
+            this.pos.y = ghostBall.pos.y;
+        }
         this.pos.y = clamp(this.pos.y, this.size.y/2, levelSize.y - this.size.y/2);
     }
 
