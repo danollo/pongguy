@@ -58,7 +58,9 @@ class Ball extends EngineObject
     {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
-        ghostBall = new GhostBall();
+        if(!ghostBall) {
+            ghostBall = new GhostBall();
+        }
         if (o == player || o == computer) {
             this.velocity = this.velocity.rotate(.2 * (this.pos.y - o.pos.y));
             this.velocity.x = max(-this.velocity.x, .2);
