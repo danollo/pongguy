@@ -1,6 +1,11 @@
 'use strict';
 
-let ball, ghostBall, levelSize, player, computer;
+let ball;
+//let ghostBall;
+let levelSize;
+let player;
+let computer;
+const sound_bounce = new Sound([, , 1e3, , .03, .02, 1, 2, , , 940, .03, , , , , .2, .6, , .06], 0);
 
 class Player extends EngineObject {
     constructor(pos) {
@@ -23,8 +28,8 @@ class Computer extends EngineObject {
     }
 
     update() {
-        if (ghostBall) {
-            this.pos.y = ghostBall.pos.y;
+        if (ball) {
+            this.pos.y = ball.pos.y + 1.75;
         }
         this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
     }
@@ -34,19 +39,20 @@ class Computer extends EngineObject {
 class Ball extends EngineObject {
     constructor(pos) {
         super(pos, vec2(.5), tile(0));
-
-        this.velocity = vec2(-.1, -.1);
         this.setCollision();
+        this.velocity = vec2(-.1, -.1);
         this.elasticity = 1;
+    }
+
+    update() {
+        super.update();
     }
 
     collideWithObject(o) {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
-        if (!ghostBall) {
-            ghostBall = new GhostBall();
-        }
-        if (o == player || o == computer) {
+        //ghostBall = new GhostBall();
+        if (o == player) {
             this.velocity = this.velocity.rotate(.2 * (this.pos.y - o.pos.y));
             this.velocity.x = max(-this.velocity.x, .2);
             return 0;
@@ -55,10 +61,9 @@ class Ball extends EngineObject {
     }
 }
 
-class GhostBall extends EngineObject {
+/*class GhostBall extends EngineObject {
     constructor(pos) {
         super(pos, vec2(.5), tile(0));
-
         this.setCollision();
         this.elasticity = 1;
     }
@@ -74,7 +79,7 @@ class GhostBall extends EngineObject {
         }
         return 1;
     }
-}
+}*/
 
 class Wall extends EngineObject {
     constructor(pos, size) {
@@ -104,17 +109,17 @@ function gameInit() {
 function gameUpdate() {
     // called every frame at 60 frames per second
     // handle input and update the game state
-    if (ghostBall && (ghostBall.pos.x > 39 || ghostBall.pos.x < -1)) {
-        ghostBall.destroy();
-        ghostBall = 0;
-    }
+    /*  if (ghostBall && (ghostBall.pos.x > 39 || ghostBall.pos.x < -1)) {
+          ghostBall.destroy();
+          ghostBall = 0;
+      }*/
 
     if (ball && ball.pos.x > 39 || ball && ball.pos.x < -1) {
         ball.destroy();
         ball = 0;
     }
     // if (ball.pos.x > 39){ point player }
-    // if (ball.pos.x < -1){ point puter }
+    // if (ball.pos.x < -1){ point computer }
 
     if (!ball && (mouseWasPressed(0))) {
         ball = new Ball(vec2(levelSize.x / 2, levelSize.y / 2));
@@ -143,6 +148,7 @@ function gameRenderPost() {
     if (!ball) {
         drawText("click to play", cameraPos.add(vec2(0, -5)), .8, true);
     }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
