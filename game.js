@@ -137,8 +137,8 @@ function gameUpdatePost() {
 function gameRender() {
     // called before objects are rendered
     // draw any background effects that appear behind objects
-    drawRect(cameraPos, levelSize.scale(2), hsl(0, 0, .5));
-    drawRect(cameraPos, levelSize, hsl(0, 0, .02));
+    drawRect(cameraPos, levelSize.scale(2.2), hsl(0, 0, 0));
+    drawRect(cameraPos, levelSize, hsl(0, 0, 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
