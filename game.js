@@ -51,6 +51,7 @@ class Ball extends EngineObject {
     collideWithObject(o) {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
+        sound_bounce.play(this.pos, 1, speed*2);
         //ghostBall = new GhostBall();
         if (o == player) {
             this.velocity = this.velocity.rotate(.2 * (this.pos.y - o.pos.y));
