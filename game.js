@@ -1,66 +1,49 @@
-/*
-    Little JS Hello World Demo
-    - Just prints "Hello World!"
-    - A good starting point for new projects
-*/
-
 'use strict';
 
-
-
-
-
-
-
-let ball;
-let ghostBall;
-let levelSize;
-let player;
-let computer;
+let ball, ghostBall, levelSize, player, computer;
 
 class Player extends EngineObject {
-    constructor(pos)
-    {
-        super(vec2(0,1), vec2(.5, 3.5), 0);
+    constructor(pos) {
+        super(vec2(0, 1), vec2(.5, 3.5), 0);
         this.mass = 0;
         this.setCollision();
     }
-    update(){
+
+    update() {
         this.pos.y = mousePos.y;
-        this.pos.y = clamp(this.pos.y, this.size.y/2, levelSize.y - this.size.y/2);
+        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
     }
 }
-    class Computer extends EngineObject {
-    constructor (pos) {
+
+class Computer extends EngineObject {
+    constructor(pos) {
         super(vec2(levelSize.x, .5), vec2(.5, 3.5), 0);
         this.mass = 0;
         this.setCollision();
     }
 
-    update(){
-        if(ghostBall) {
+    update() {
+        if (ghostBall) {
             this.pos.y = ghostBall.pos.y;
         }
-        this.pos.y = clamp(this.pos.y, this.size.y/2, levelSize.y - this.size.y/2);
+        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
     }
 
 }
 
-class Ball extends EngineObject
-{
-    constructor(pos)
-    {
+class Ball extends EngineObject {
+    constructor(pos) {
         super(pos, vec2(.5), tile(0));
 
         this.velocity = vec2(-.1, -.1);
         this.setCollision();
         this.elasticity = 1;
     }
-    collideWithObject(o)
-    {
+
+    collideWithObject(o) {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
-        if(!ghostBall) {
+        if (!ghostBall) {
             ghostBall = new GhostBall();
         }
         if (o == player || o == computer) {
@@ -70,21 +53,17 @@ class Ball extends EngineObject
         }
         return 1;
     }
-    }
+}
 
-class GhostBall extends EngineObject
-{
-    constructor(pos)
-    {
-        super(pos, vec2(ball.pos.x, ball.pos.y));
-        this.pos.x += 1;
-        this.pos.y += 1;
+class GhostBall extends EngineObject {
+    constructor(pos) {
+        super(pos, vec2(.5), tile(0));
 
         this.setCollision();
         this.elasticity = 1;
     }
-    collideWithObject(o)
-    {
+
+    collideWithObject(o) {
         const speed = min(1.11 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
 
@@ -96,17 +75,18 @@ class GhostBall extends EngineObject
         return 1;
     }
 }
+
 class Wall extends EngineObject {
     constructor(pos, size) {
         super(pos, size);
         this.setCollision();
-        this.mass=0;
+        this.mass = 0;
         this.elasticity = 1;
     }
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-function gameInit()
-{
+function gameInit() {
     // called once after the engine starts up
     // setup the game
     canvasFixedSize = vec2(1280, 720);
@@ -115,57 +95,53 @@ function gameInit()
     player = new Player(vec2(levelSize.y));
     computer = new Computer(vec2(levelSize.y));
     const pos = vec2();
-    new Wall(vec2(levelSize.y/2, -1), vec2(100,2))// top// left
-    new Wall(vec2(levelSize.x/2,levelSize.y+1), vec2(100,2)) // right
+    new Wall(vec2(levelSize.y / 2, -1), vec2(100, 2))// top// left
+    new Wall(vec2(levelSize.x / 2, levelSize.y + 1), vec2(100, 2)) // right
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameUpdate()
-{
+function gameUpdate() {
     // called every frame at 60 frames per second
     // handle input and update the game state
-    if (ghostBall && (ghostBall.pos.x > 39 || ghostBall.pos.x < -1)){
+    if (ghostBall && (ghostBall.pos.x > 39 || ghostBall.pos.x < -1)) {
         ghostBall.destroy();
         ghostBall = 0;
     }
 
-    if (ball && ball.pos.x > 39 || ball && ball.pos.x < -1){
+    if (ball && ball.pos.x > 39 || ball && ball.pos.x < -1) {
         ball.destroy();
         ball = 0;
     }
     // if (ball.pos.x > 39){ point player }
     // if (ball.pos.x < -1){ point puter }
 
-    if (!ball && (mouseWasPressed(0))){
-        ball = new Ball(vec2(levelSize.x/2, levelSize.y/2));
+    if (!ball && (mouseWasPressed(0))) {
+        ball = new Ball(vec2(levelSize.x / 2, levelSize.y / 2));
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameUpdatePost()
-{
+function gameUpdatePost() {
     // called after physics and objects are updated
     // setup camera and prepare for render
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameRender()
-{
+function gameRender() {
     // called before objects are rendered
     // draw any background effects that appear behind objects
-    drawRect(cameraPos, levelSize.scale(2), hsl(0,0,.5));
-    drawRect(cameraPos, levelSize, hsl(0,0,.02));
+    drawRect(cameraPos, levelSize.scale(2), hsl(0, 0, .5));
+    drawRect(cameraPos, levelSize, hsl(0, 0, .02));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameRenderPost()
-{
+function gameRenderPost() {
     // called after objects are rendered
     // draw effects or hud that appear above all objects
     drawTextScreen('god i miss bfa', mainCanvasSize.scale(.5), 80);
-    if (!ball){
-        drawText("click to play", cameraPos.add(vec2(0,-5)), .8 , true);
+    if (!ball) {
+        drawText("click to play", cameraPos.add(vec2(0, -5)), .8, true);
     }
 }
 
