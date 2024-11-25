@@ -5,8 +5,8 @@ let ball;
 let levelSize;
 let player;
 let computer;
-let playerScore = 0;
-let computerScore = 0;
+let playerScore = 2;
+let computerScore = 3;
 const sound_bounce = new Sound([, , 1e3, , .03, .02, 1, 2, , , 940, .03, , , , , .2, .6, , .06], 0);
 const antialiasing = setCanvasPixelated();
 fontDefault = "'Press Start 2P', sans-serif";
@@ -32,9 +32,7 @@ class Computer extends EngineObject {
     update() {
         if (ball) {
             
-            let speedFactor = 0.3 + (Math.floor((playerScore + computerScore) / 2) * 0.05);
-
-
+            let speedFactor = 0.3 + Math.min(0.1 * (playerScore + computerScore), 0.8);
             this.pos.y += (ball.pos.y - this.pos.y) * speedFactor;
 
             this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
@@ -149,8 +147,8 @@ function gameRender() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
-    drawTextScreen(playerScore, vec2(900, 60), 50);
-    drawTextScreen(computerScore, vec2(360, 60), 50);
+    drawTextScreen(computerScore, vec2(900, 60), 50);
+    drawTextScreen(playerScore, vec2(360, 60), 50);
     if (!ball) {
         drawText("Click to Play", cameraPos.add(vec2(0 + Math.sin(time * 2.1) * 2, 2)), 1);
     }
