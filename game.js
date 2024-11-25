@@ -1,11 +1,15 @@
 'use strict';
 
 let ball;
-//let ghostBall;
+//let ghostBall;//
 let levelSize;
 let player;
 let computer;
+let playerScore = 0;
+let computerScore = 0;
 const sound_bounce = new Sound([, , 1e3, , .03, .02, 1, 2, , , 940, .03, , , , , .2, .6, , .06], 0);
+const antialiasing = setCanvasPixelated();
+fontDefault = "'Press Start 2P', sans-serif";
 
 class Player extends EngineObject {
     constructor(pos) {
@@ -33,7 +37,6 @@ class Computer extends EngineObject {
         }
         this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
     }
-
 }
 
 class Ball extends EngineObject {
@@ -45,14 +48,15 @@ class Ball extends EngineObject {
     }
 
     update() {
+
         super.update();
     }
 
     collideWithObject(o) {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
-        sound_bounce.play(this.pos, 1, speed*2);
-        //ghostBall = new GhostBall();
+        sound_bounce.play(this.pos, 1, speed * 2);
+        //ghostBall = new GhostBall();//
         if (o == player) {
             this.velocity = this.velocity.rotate(.2 * (this.pos.y - o.pos.y));
             this.velocity.x = max(-this.velocity.x, .2);
@@ -62,7 +66,8 @@ class Ball extends EngineObject {
     }
 }
 
-/*class GhostBall extends EngineObject {
+/*
+class GhostBall extends EngineObject {
     constructor(pos) {
         super(pos, vec2(.5), tile(0));
         this.setCollision();
@@ -80,7 +85,8 @@ class Ball extends EngineObject {
         }
         return 1;
     }
-}*/
+}
+*/
 
 class Wall extends EngineObject {
     constructor(pos, size) {
@@ -88,39 +94,35 @@ class Wall extends EngineObject {
         this.setCollision();
         this.mass = 0;
         this.elasticity = 1;
+        this.color = rgb(0, 0, 0)
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
-    // called once after the engine starts up
-    // setup the game
     canvasFixedSize = vec2(1280, 720);
     levelSize = vec2(38, 20);
     cameraPos = levelSize.scale(.5);
     player = new Player(vec2(levelSize.y));
     computer = new Computer(vec2(levelSize.y));
     const pos = vec2();
-    new Wall(vec2(levelSize.y / 2, -1), vec2(100, 2))// top// left
-    new Wall(vec2(levelSize.x / 2, levelSize.y + 1), vec2(100, 2)) // right
-
+    new Wall(vec2(levelSize.y / 2, -2), vec2(100, 2))
+    new Wall(vec2(levelSize.x / 2, levelSize.y + 2), vec2(100, 2))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-    // called every frame at 60 frames per second
-    // handle input and update the game state
-    /*  if (ghostBall && (ghostBall.pos.x > 39 || ghostBall.pos.x < -1)) {
-          ghostBall.destroy();
-          ghostBall = 0;
-      }*/
-
-    if (ball && ball.pos.x > 39 || ball && ball.pos.x < -1) {
-        ball.destroy();
-        ball = 0;
+    if (ball) {
+        if (ball.pos.x > 39) {
+            playerScore++;
+            ball.destroy();
+            ball = 0;
+        } else if (ball.pos.x < -1) {
+            computerScore++;
+            ball.destroy();
+            ball = 0;
+        }
     }
-    // if (ball.pos.x > 39){ point player }
-    // if (ball.pos.x < -1){ point computer }
 
     if (!ball && (mouseWasPressed(0))) {
         ball = new Ball(vec2(levelSize.x / 2, levelSize.y / 2));
@@ -135,19 +137,17 @@ function gameUpdatePost() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-    // called before objects are rendered
-    // draw any background effects that appear behind objects
-    drawRect(cameraPos, levelSize.scale(2.2), hsl(0, 0, 0));
-    drawRect(cameraPos, levelSize, hsl(0, 0, 0));
+    for (let y = 0; y < levelSize.y; y += .8999) {
+        drawRect(vec2(levelSize.x / 2, y), vec2(0.25, 0.5), hsl(0, 0, 1));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
-    // called after objects are rendered
-    // draw effects or hud that appear above all objects
-    drawTextScreen('god i miss bfa', mainCanvasSize.scale(.5), 80);
+    drawTextScreen(playerScore, vec2(900, 60), 50);
+    drawTextScreen(computerScore, vec2(360, 60), 50);
     if (!ball) {
-        drawText("click to play", cameraPos.add(vec2(0, -5)), .8, true);
+        drawText("Click to Play", cameraPos.add(vec2(0 + Math.sin(time * 2.1) * 2, 2)), 1);
     }
 
 }
