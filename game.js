@@ -23,19 +23,22 @@ class Player extends EngineObject {
         this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
     }
 }
-
 class Computer extends EngineObject {
     constructor(pos) {
         super(vec2(levelSize.x, .5), vec2(.5, 3.5), 0);
         this.mass = 0;
         this.setCollision();
     }
-
     update() {
         if (ball) {
-            this.pos.y = ball.pos.y + 1.75;
-        }
-        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
+            
+            let speedFactor = 0.3 + (Math.floor((playerScore + computerScore) / 2) * 0.05);
+
+
+            this.pos.y += (ball.pos.y - this.pos.y) * speedFactor;
+
+            this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
+    }
     }
 }
 
@@ -45,21 +48,23 @@ class Ball extends EngineObject {
         this.setCollision();
         this.velocity = vec2(-.1, -.1);
         this.elasticity = 1;
+
     }
 
     update() {
-
+            
         super.update();
     }
+
 
     collideWithObject(o) {
         const speed = min(1.04 * this.velocity.length(), .5)
         this.velocity = this.velocity.normalize(speed);
-        sound_bounce.play(this.pos, 1, speed * 2);
+        sound_bounce.play(this.pos, 1, speed * 1.25);
         //ghostBall = new GhostBall();//
         if (o == player) {
-            this.velocity = this.velocity.rotate(.2 * (this.pos.y - o.pos.y));
-            this.velocity.x = max(-this.velocity.x, .2);
+            this.velocity = this.velocity.rotate(.1 * (this.pos.y - o.pos.y));
+            this.velocity.x = max(-this.velocity.x, .3);
             return 0;
         }
         return 1;
@@ -106,8 +111,8 @@ function gameInit() {
     player = new Player(vec2(levelSize.y));
     computer = new Computer(vec2(levelSize.y));
     const pos = vec2();
-    new Wall(vec2(levelSize.y / 2, -2), vec2(100, 2))
-    new Wall(vec2(levelSize.x / 2, levelSize.y + 2), vec2(100, 2))
+    new Wall(vec2(levelSize.y / 2, -2), vec2(555, 2))
+    new Wall(vec2(levelSize.x / 2, levelSize.y + 2), vec2(555, 2))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
